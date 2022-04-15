@@ -2,13 +2,13 @@ package com.example.tp2_chat_api;
 
 import java.util.ArrayList;
 
-public class ListConversations {
+public class ListMessages {
     String version;
     String success;
     String status;
-    ArrayList<Conversation> conversations;
+    ArrayList<Message> messages;
 
-    //{"version":1.3,"success":true,"status":200,"conversations"
+
 
     @Override
     public String toString() {
@@ -16,14 +16,12 @@ public class ListConversations {
                 "version='" + version + '\'' +
                 ", success='" + success + '\'' +
                 ", status='" + status + '\'' +
-                ", conversations=" + conversations +
+                ", messages=" + messages +
                 '}';
     }
 
 
-    public ArrayList<Conversation> getConversations() {
-        return conversations;
+    public ArrayList<Message> getMessages() {
+        return messages;
     }
-
-
 }

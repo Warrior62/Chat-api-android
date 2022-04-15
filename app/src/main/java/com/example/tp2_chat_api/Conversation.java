@@ -1,4 +1,4 @@
-package com.example.chat_2022_eleves;
+package com.example.tp2_chat_api;
 
 public class Conversation {
     String id;
@@ -23,5 +23,9 @@ public class Conversation {
 
     public String getTheme() {
         return theme;
+    }
+
+    public String getId() {
+        return id;
     }
 }

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/lightgreen"
-    tools:context=".ChoixConversationActivity">
+    tools:context=".ChoixConvActivity">
 
     <TextView
         android:id="@+id/textView"
@@ -18,22 +18,35 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Spinner
+        android:id="@+id/spinConversations"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:contentDescription="@string/spinConversations"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <TextView
+        android:id="@+id/textViewMsg"
+        android:layout_width="343dp"
+        android:layout_height="231dp"
+        android:layout_marginTop="128dp"
+        android:scrollbarStyle="insideInset"
+        android:scrollbars="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.493"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinConversations" />
+
     <Button
         android:id="@+id/btnChoixConv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:enabled="false"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="44dp"
         android:text="OK"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinConversations" />
-
-    <Spinner
-        android:id="@+id/spinConversations"
-
-        android:layout_width="0dp"
-        android:layout_height="60dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
 </android.support.constraint.ConstraintLayout>
