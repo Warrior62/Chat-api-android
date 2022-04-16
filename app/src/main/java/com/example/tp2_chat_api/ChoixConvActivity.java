@@ -1,9 +1,14 @@
 package com.example.tp2_chat_api;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 import android.text.method.ScrollingMovementMethod;
+import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,6 +20,7 @@ import android.widget.Toast;
 
 import com.example.tp2_chat_api.GlobalState;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -87,9 +93,14 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
                                 for(Message m : listeMsg) {
                                     lmStr.add(m.getContenu());
                                     lmMap.put(m.getId(), m.getContenu());
-                                    textViewMsg.append(m.getAuteur() + " : " + m.getContenu() + "\n");
+                                    SpannableString spannableString = new SpannableString(m.getContenu());
+                                    HashMap<String, ArrayList<Integer>> words = splitSentenceByWords(m.getContenu(), spannableString);
+                                    Log.i("ChoixConv", String.valueOf(words));
+                                    textViewMsg.append(spannableString);
+                                    textViewMsg.setMovementMethod(LinkMovementMethod.getInstance());
+                                    //textViewMsg.append(m.getAuteur() + " : " + m.getContenu() + "\n");
                                 }
-                                textViewMsg.setMovementMethod(new ScrollingMovementMethod());
+                                //textViewMsg.setMovementMethod(new ScrollingMovementMethod());
                             }
 
                             @Override
@@ -122,5 +133,97 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
 
     }
 
+    public HashMap<String, ArrayList<Integer>> splitSentenceByWords(String str, SpannableString sstr){
 
+        //if string is empty or null, return empty array
+        if(str == null || str.equals(""))
+            return new HashMap<>();
+
+        HashMap<String, ArrayList<Integer>> words = new HashMap<>();
+        int begin = 0;
+        for(int i=0; i<str.length(); i++){
+            if(str.charAt(i) == ' ' && i > 0) {
+                String word = str.substring(begin, i);
+                ArrayList<Integer> indexes = new ArrayList<>();
+                indexes.add(begin);
+                indexes.add(i-1);
+                words.put(word, indexes);
+                ClickableSpan clickableSpan = new ClickableSpan() {
+                    @Override
+                    public void onClick(View widget) {
+                        Toast.makeText(ChoixConvActivity.this, word, Toast.LENGTH_SHORT).show();
+                        JSONAsyncTask reqGET = new JSONAsyncTask();
+                        reqGET.execute("https://api.dictionaryapi.dev/api/v2/entries/en/"+word, "");
+                    }
+                };
+                sstr.setSpan(clickableSpan, begin,i, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                begin = i + 1;
+
+            }
+            if(i == str.length()-1){
+                String word = str.substring(begin, i+1);
+                ArrayList<Integer> indexes = new ArrayList<>();
+                indexes.add(begin);
+                indexes.add(i);
+                words.put(word, indexes);
+                ClickableSpan clickableSpan = new ClickableSpan() {
+                    @Override
+                    public void onClick(View widget) {
+                        Toast.makeText(ChoixConvActivity.this, word, Toast.LENGTH_SHORT).show();
+                        JSONAsyncTask reqGET = new JSONAsyncTask();
+                        reqGET.execute("https://api.dictionaryapi.dev/api/v2/entries/en/"+word, "");
+                    }
+                };
+                sstr.setSpan(clickableSpan, begin,i+1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                begin = i;
+
+            }
+        }
+
+        return words;
+    }
+
+    class JSONAsyncTask extends AsyncTask<String, Void, String> {
+        // Params, Progress, Result
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Log.i(gs.CAT,"onPreExecute");
+        }
+
+        @Override
+        protected String doInBackground(String... data) {
+            // pas d'interaction avec l'UI Thread ici
+            // data[0] contient le premier arg passé execute()
+            // data[1] contient le second arg passé execute()
+
+
+            String res = gs.requeteGET(data[0], data[1]);
+
+            try {
+                ArrayList<String> defs = new ArrayList<>();
+                JSONArray array = new JSONArray(res);
+                JSONObject obj = array.getJSONObject(0);
+                JSONArray meanings = obj.getJSONArray("meanings");
+                for(int i=0; i<meanings.length(); i++){
+                    JSONArray definitions = meanings.getJSONObject(i).getJSONArray("definitions");
+                    for(int j=0; j<definitions.length(); j++){
+                        String def = (String) definitions.getJSONObject(j).get("definition");
+                        defs.add(def);
+                    }
+                }
+                Log.i(gs.CAT,"defs = " + defs);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return res;
+        }
+
+        protected void onPostExecute(String result) {
+            Log.i(gs.CAT,"onPostExecute");
+            Log.d("ChoixConv", result);
+            //gs.alerter(result);
+        }
+    }
 }
