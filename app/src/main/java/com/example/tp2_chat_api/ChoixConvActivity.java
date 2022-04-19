@@ -1,5 +1,6 @@
 package com.example.tp2_chat_api;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -25,15 +26,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class ChoixConvActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -42,6 +46,7 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
     TextView textViewMsg;
     Button btnChoixConv;
     int indexConv;
+    String hash;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,73 +54,69 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
         setContentView(R.layout.activity_choix_conversation);
         gs = (GlobalState) getApplication();
         Bundle bdl = this.getIntent().getExtras();
-        gs.alerter("hash : " + bdl.getString("hash"));
 
         textViewMsg = findViewById(R.id.textViewMsg);
         btnChoixConv = findViewById(R.id.btnChoixConv);
+        hash = bdl.getString("hash");
 
         APIInterface apiService = APIClient.getClient().create(APIInterface.class);
-        Call<ListConversations> callGetConvs = apiService.doGetListConversation(bdl.getString("hash"));
+        Call<ListConversations> callGetConvs = apiService.doGetListConversation(hash);
         callGetConvs.enqueue(new Callback<ListConversations>() {
             @Override
             public void onResponse(Call<ListConversations> call, Response<ListConversations> response) {
                 ListConversations lc = response.body();
-                ArrayList<Conversation> listeConv = lc.getConversations();
-                Log.v("ChoixConv", listeConv.toString());
-                List<String> lcStr = new ArrayList<>();
-                ArrayList<String> lcId = new ArrayList<>();
-                for(Conversation c : listeConv) {
-                    lcStr.add(c.getTheme());
-                    lcId.add(c.getId());
-                }
-                Spinner spinner = (Spinner) findViewById(R.id.spinConversations);
-                spinner.setOnItemSelectedListener((AdapterView.OnItemSelectedListener) cca);
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(cca, android.R.layout.simple_spinner_item, lcStr);
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinner.setAdapter(adapter);
+                if(lc != null){
+                    ArrayList<Conversation> listeConv = lc.getConversations();
+                    Log.v("ChoixConv", listeConv.toString());
+                    List<String> lcStr = new ArrayList<>();
+                    ArrayList<String> lcId = new ArrayList<>();
+                    for(Conversation c : listeConv) {
+                        lcStr.add(c.getTheme());
+                        lcId.add(c.getId());
+                    }
 
+                    Spinner spinner = (Spinner) findViewById(R.id.spinConversations);
+                    spinner.setOnItemSelectedListener(cca);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(cca, android.R.layout.simple_spinner_item, lcStr);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spinner.setAdapter(adapter);
 
-                btnChoixConv.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
+                    // GET ListMessages
+                    btnChoixConv.setOnClickListener(view -> {
                         textViewMsg.setText("");
                         String idConv = lcId.get(indexConv);
-                        Call<ListMessages> callGetMsg = apiService.doGetListMessage(bdl.getString("hash"), idConv);
+                        Call<ListMessages> callGetMsg = apiService.doGetListMessage(hash, idConv);
                         callGetMsg.enqueue(new Callback<ListMessages>() {
                             @Override
-                            public void onResponse(Call<ListMessages> call, Response<ListMessages> response) {
-                                ListMessages lm = response.body();
+                            public void onResponse(Call<ListMessages> call1, Response<ListMessages> response1) {
+                                ListMessages lm = response1.body();
                                 ArrayList<Message> listeMsg = lm.getMessages();
                                 Log.v("ChoixConv", "idConv="+idConv+", indexConv="+indexConv);
-                                Log.v("ChoixConv", listeMsg.toString());
-                                List<String> lmStr = new ArrayList<>();
-                                HashMap<String, String> lmMap = new HashMap<>();
+                                String toDisplay = "";
+                                ArrayList<String> auteurList = new ArrayList<>();
                                 for(Message m : listeMsg) {
-                                    lmStr.add(m.getContenu());
-                                    lmMap.put(m.getId(), m.getContenu());
-                                    SpannableString spannableString = new SpannableString(m.getContenu());
-                                    HashMap<String, ArrayList<Integer>> words = splitSentenceByWords(m.getContenu(), spannableString);
-                                    Log.i("ChoixConv", String.valueOf(words));
-                                    textViewMsg.append(spannableString);
-                                    textViewMsg.setMovementMethod(LinkMovementMethod.getInstance());
-                                    //textViewMsg.append(m.getAuteur() + " : " + m.getContenu() + "\n");
+                                    toDisplay += (m.getAuteur() + " : " + m.getContenu() + "\n");
+                                    auteurList.add(m.getAuteur());
                                 }
-                                //textViewMsg.setMovementMethod(new ScrollingMovementMethod());
+                                Set<String> auteurs = new LinkedHashSet<>(auteurList);
+                                SpannableString spannableString = new SpannableString(toDisplay);
+                                splitStringByWords(toDisplay, spannableString, auteurs);
+                                textViewMsg.setText(spannableString);
+                                textViewMsg.setMovementMethod(new ScrollingMovementMethod());
+                                textViewMsg.setMovementMethod(LinkMovementMethod.getInstance());
                             }
 
                             @Override
-                            public void onFailure(Call<ListMessages> call, Throwable t) {
+                            public void onFailure(Call<ListMessages> call1, Throwable t) {
 
                             }
                         });
-                    }
-                });
+                    });
+                }
             }
 
             @Override
-            public void onFailure(Call<ListConversations> call, Throwable t) {
-
-            }
+            public void onFailure(Call<ListConversations> call, Throwable t) {}
         });
     }
 
@@ -124,63 +125,87 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
         // On selecting a spinner item
         String item = adapterView.getItemAtPosition(i).toString();
         indexConv = i;
-        // Showing selected spinner item
-        Toast.makeText(adapterView.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
+    public void onNothingSelected(AdapterView<?> adapterView) {}
 
+    public HashMap<Integer, Integer> findIndexes(String searchString, String keyword) {
+        try {
+            String regex = "\\b" + keyword + "\\b";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(searchString);
+
+            HashMap<Integer, Integer> wrappers = new HashMap<>();
+
+            while (matcher.find()) {
+                int end = matcher.end();
+                int start = matcher.start();
+                wrappers.put(start, end);
+            }
+            return wrappers;
+        } catch(Exception e){
+            Toast.makeText(cca, "Problem with regex", Toast.LENGTH_LONG);
+            return new HashMap<>();
+        }
     }
 
-    public HashMap<String, ArrayList<Integer>> splitSentenceByWords(String str, SpannableString sstr){
+    public void splitStringByWords(String str, SpannableString sstr, Set<String> auteurs){
 
-        //if string is empty or null, return empty array
-        if(str == null || str.equals(""))
-            return new HashMap<>();
+        String[] words = str.split(" |\n");
+        ArrayList<String> wordsList = new ArrayList<>();
+        for(String s : words)
+            wordsList.add(s);
+        for(int i=0; i<wordsList.size(); i++)
+            if(wordsList.get(i).equals(":"))
+                wordsList.remove(i);
 
-        HashMap<String, ArrayList<Integer>> words = new HashMap<>();
-        int begin = 0;
-        for(int i=0; i<str.length(); i++){
-            if(str.charAt(i) == ' ' && i > 0) {
-                String word = str.substring(begin, i);
-                ArrayList<Integer> indexes = new ArrayList<>();
-                indexes.add(begin);
-                indexes.add(i-1);
-                words.put(word, indexes);
-                ClickableSpan clickableSpan = new ClickableSpan() {
-                    @Override
-                    public void onClick(View widget) {
-                        Toast.makeText(ChoixConvActivity.this, word, Toast.LENGTH_SHORT).show();
-                        JSONAsyncTask reqGET = new JSONAsyncTask();
-                        reqGET.execute("https://api.dictionaryapi.dev/api/v2/entries/en/"+word, "");
-                    }
-                };
-                sstr.setSpan(clickableSpan, begin,i, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                begin = i + 1;
-
+        // Create clickable words
+        for(String s : wordsList){
+            boolean isAuteur = false;
+            // find indexes of s
+            HashMap<Integer, Integer> matches = findIndexes(str, s);
+            for(String auteur : auteurs)
+                if(s.equals(auteur))
+                    isAuteur = true;
+            if(!isAuteur){
+                for(Map.Entry<Integer, Integer> entry: matches.entrySet()){
+                    ClickableSpan clickableSpan = new ClickableSpan() {
+                        @Override
+                        public void onClick(View widget) {
+                            JSONAsyncTask reqGET = new JSONAsyncTask();
+                            reqGET.execute("https://api.dictionaryapi.dev/api/v2/entries/en/"+s, "");
+                        }
+                    };
+                    int start = entry.getKey();
+                    int end = entry.getValue();
+                    sstr.setSpan(clickableSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
             }
-            if(i == str.length()-1){
-                String word = str.substring(begin, i+1);
-                ArrayList<Integer> indexes = new ArrayList<>();
-                indexes.add(begin);
-                indexes.add(i);
-                words.put(word, indexes);
-                ClickableSpan clickableSpan = new ClickableSpan() {
-                    @Override
-                    public void onClick(View widget) {
-                        Toast.makeText(ChoixConvActivity.this, word, Toast.LENGTH_SHORT).show();
-                        JSONAsyncTask reqGET = new JSONAsyncTask();
-                        reqGET.execute("https://api.dictionaryapi.dev/api/v2/entries/en/"+word, "");
-                    }
-                };
-                sstr.setSpan(clickableSpan, begin,i+1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                begin = i;
+        }
+    }
 
+    private void getDefinitions(String res) throws JSONException {
+        ArrayList<String> defs = new ArrayList<>();
+        JSONArray array = new JSONArray(res);
+        JSONObject obj = array.getJSONObject(0);
+        JSONArray meanings = obj.getJSONArray("meanings");
+        for(int i=0; i<meanings.length(); i++){
+            JSONArray definitions = meanings.getJSONObject(i).getJSONArray("definitions");
+            for(int j=0; j<definitions.length(); j++){
+                String def = (String) definitions.getJSONObject(j).get("definition");
+                defs.add(def);
             }
         }
 
-        return words;
+        String word = obj.getString("word");
+        Bundle bdl = new Bundle();
+        bdl.putStringArrayList("defs", defs);
+        bdl.putString("word", word);
+
+        Intent toDefinition = new Intent(this, Definition.class);
+        toDefinition.putExtras(bdl);
+        startActivity(toDefinition);
     }
 
     class JSONAsyncTask extends AsyncTask<String, Void, String> {
@@ -198,22 +223,9 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
             // data[0] contient le premier arg passé execute()
             // data[1] contient le second arg passé execute()
 
-
             String res = gs.requeteGET(data[0], data[1]);
-
             try {
-                ArrayList<String> defs = new ArrayList<>();
-                JSONArray array = new JSONArray(res);
-                JSONObject obj = array.getJSONObject(0);
-                JSONArray meanings = obj.getJSONArray("meanings");
-                for(int i=0; i<meanings.length(); i++){
-                    JSONArray definitions = meanings.getJSONObject(i).getJSONArray("definitions");
-                    for(int j=0; j<definitions.length(); j++){
-                        String def = (String) definitions.getJSONObject(j).get("definition");
-                        defs.add(def);
-                    }
-                }
-                Log.i(gs.CAT,"defs = " + defs);
+                getDefinitions(res);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -223,7 +235,8 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
         protected void onPostExecute(String result) {
             Log.i(gs.CAT,"onPostExecute");
             Log.d("ChoixConv", result);
-            //gs.alerter(result);
+            if(result == null || result.equals(""))
+                gs.alerter("Unknown or non-english");
         }
     }
 }
