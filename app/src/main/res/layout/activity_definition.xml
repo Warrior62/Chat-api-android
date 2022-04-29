@@ -9,11 +9,12 @@
 
     <TextView
         android:id="@+id/textViewDefinitions"
-        android:layout_width="365dp"
-        android:layout_height="452dp"
+        android:layout_width="363dp"
+        android:layout_height="338dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="96dp"
         android:background="@color/white"
+        android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/definitions" />
 
@@ -21,11 +22,11 @@
         android:id="@+id/definitions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="124dp"
         android:layout_marginTop="16dp"
-        android:text="Définitions"
+        android:text="Meanings"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:textColor="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -33,11 +34,14 @@
         android:id="@+id/textViewWord"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="204dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="28dp"
+        android:textAlignment="center"
         android:textColor="#F44336"
         android:textSize="34sp"
         android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/definitions" />
+        app:layout_constraintTop_toBottomOf="@+id/definitions"
+        tools:text="Word" />
 </android.support.constraint.ConstraintLayout>

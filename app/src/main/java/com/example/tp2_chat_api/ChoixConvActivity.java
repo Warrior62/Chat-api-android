@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.method.ScrollingMovementMethod;
 import android.text.style.ClickableSpan;
@@ -123,7 +124,6 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         // On selecting a spinner item
-        String item = adapterView.getItemAtPosition(i).toString();
         indexConv = i;
     }
 
@@ -172,6 +172,10 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
                 for(Map.Entry<Integer, Integer> entry: matches.entrySet()){
                     ClickableSpan clickableSpan = new ClickableSpan() {
                         @Override
+                        public void updateDrawState(TextPaint ds) {
+                            ds.setUnderlineText(false);
+                        }
+                        @Override
                         public void onClick(View widget) {
                             JSONAsyncTask reqGET = new JSONAsyncTask();
                             reqGET.execute("https://api.dictionaryapi.dev/api/v2/entries/en/"+s, "");
@@ -194,7 +198,7 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
             JSONArray definitions = meanings.getJSONObject(i).getJSONArray("definitions");
             for(int j=0; j<definitions.length(); j++){
                 String def = (String) definitions.getJSONObject(j).get("definition");
-                defs.add(def);
+                defs.add("* " + def);
             }
         }
 
