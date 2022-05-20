@@ -13,19 +13,19 @@
 
     <ConstraintSet android:id="@+id/start">
         <Constraint
-            android:layout_height="522dp"
-            android:layout_width="343dp"
+            android:layout_height="430dp"
+            android:layout_width="332dp"
             android:id="@+id/textViewMsg"
             motion:layout_constraintEnd_toEndOf="parent"
             motion:layout_constraintStart_toStartOf="parent"
             motion:layout_constraintVertical_bias="0.0"
-            motion:layout_constraintBottom_toTopOf="@+id/textView4"
+            motion:layout_constraintBottom_toTopOf="@+id/textMsg"
             motion:layout_constraintTop_toBottomOf="@id/spinConversations"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="32dp"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="24dp"
-            motion:layout_constraintHorizontal_bias="0.50" />
+            motion:layout_constraintHorizontal_bias="0.0" />
         <Constraint
             android:layout_height="wrap_content"
             motion:layout_constraintEnd_toEndOf="parent"
@@ -51,28 +51,24 @@
         <Constraint
             android:layout_height="54dp"
             android:layout_width="341dp"
-            android:id="@+id/textView4"
+            android:id="@+id/textMsg"
             motion:layout_constraintEnd_toStartOf="@+id/imageButton"
             motion:layout_constraintStart_toStartOf="parent"
             motion:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginTop="664dp"
-            motion:layout_constraintTop_toTopOf="parent"
-            motion:layout_editor_absoluteY="673dp"
-            motion:layout_editor_absoluteX="7dp"
             android:layout_marginStart="16dp" />
         <Constraint
             android:layout_height="56dp"
             android:layout_width="58dp"
             android:id="@+id/imageButton"
             motion:layout_constraintEnd_toEndOf="parent"
-            motion:layout_constraintTop_toTopOf="@+id/textView4"
+            motion:layout_constraintTop_toTopOf="@+id/textMsg"
             android:layout_marginTop="0dp"
-            motion:layout_constraintStart_toEndOf="@+id/textView4"
+            motion:layout_constraintStart_toEndOf="@+id/textMsg"
             android:layout_marginStart="0dp"
             android:layout_marginLeft="7dp"
             motion:layout_constraintHorizontal_bias="0.0"
             motion:layout_constraintVertical_bias="0.0"
-            motion:layout_constraintBottom_toBottomOf="@+id/textView4"
+            motion:layout_constraintBottom_toBottomOf="@+id/textMsg"
             android:layout_marginBottom="0dp"
             android:layout_marginEnd="8dp" />
         <Constraint
@@ -86,7 +82,7 @@
             android:layout_height="55dp"
             motion:layout_editor_absoluteX="27dp"
             android:layout_width="310dp"
-            android:id="@+id/textView4" />
+            android:id="@+id/textMsg" />
         <Constraint
             android:layout_height="41dp"
             motion:layout_constraintStart_toStartOf="parent"

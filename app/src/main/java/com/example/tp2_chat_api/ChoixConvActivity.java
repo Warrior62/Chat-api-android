@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatImageButton;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +48,8 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
     ChoixConvActivity cca = this;
     TextView textViewMsg;
     Button btnChoixConv;
+    EditText inputMsg;
+    AppCompatImageButton btnSendMsg;
     int indexConv;
     String hash;
 
@@ -58,6 +62,8 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
 
         textViewMsg = findViewById(R.id.textViewMsg);
         btnChoixConv = findViewById(R.id.btnChoixConv);
+        inputMsg = findViewById(R.id.textMsg);
+        btnSendMsg = findViewById(R.id.imageButton);
         hash = bdl.getString("hash");
 
         APIInterface apiService = APIClient.getClient().create(APIInterface.class);
@@ -105,6 +111,11 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
                                 textViewMsg.setText(spannableString);
                                 textViewMsg.setMovementMethod(new ScrollingMovementMethod());
                                 textViewMsg.setMovementMethod(LinkMovementMethod.getInstance());
+
+                                btnSendMsg.setOnClickListener(view -> {
+                                    ChoixConvActivity.PostAsyncTask reqPOST= new PostAsyncTask();
+                                    reqPOST.execute("http://tomnab.fr/chat-api/conversations/"+idConv+"/messages?contenu="+inputMsg.getText().toString(), "");
+                                });
                             }
 
                             @Override
@@ -129,6 +140,20 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {}
+
+    class PostAsyncTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... data) {
+            return gs.requetePOST(data[0] ,data[1]);
+        }
+
+        protected void onPostExecute(String hash) {}
+    }
 
     public HashMap<Integer, Integer> findIndexes(String searchString, String keyword) {
         try {

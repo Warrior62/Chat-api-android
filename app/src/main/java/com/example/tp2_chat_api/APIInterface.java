@@ -3,6 +3,7 @@ package com.example.tp2_chat_api;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 public interface APIInterface {
@@ -12,4 +13,7 @@ public interface APIInterface {
 
         @GET("conversations/{id}/messages")
         Call<ListMessages> doGetListMessage(@Header("hash") String hash, @Path("id") String idConv);
+
+        @POST("conversations/{id}/messages?contenu={message}")
+        Call doPostMessage(@Header("hash") String hash, @Path("id") String idConv, @Path("message") String message);
 }
