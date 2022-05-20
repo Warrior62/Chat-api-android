@@ -1,10 +1,10 @@
 <resources>
     <string name="app_name">Chat2022</string>
     <string name="appname">Clavardons !</string>
-    <string name="login">Login :</string>
+    <string name="login">Pseudo :</string>
     <string name="passe">Mot de passe :</string>
     <string name="remember">Se souvenir de moi :</string>
-    <string name="choix_conversation">choix_conversation</string>
+    <string name="choix_conversation">choix de la conversation</string>
     <string name="spinConversations">spinConversations</string>
     <string name="title_activity_definitions">Definitions</string>
     <!-- Strings used for fragments for navigation -->

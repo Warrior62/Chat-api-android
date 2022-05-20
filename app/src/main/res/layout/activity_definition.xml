@@ -4,17 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#03A9F4"
+    android:background="#FFFFFF"
     tools:context=".Definition">
 
     <TextView
         android:id="@+id/textViewDefinitions"
-        android:layout_width="363dp"
-        android:layout_height="338dp"
-        android:layout_marginStart="20dp"
+        android:layout_width="364dp"
+        android:layout_height="540dp"
         android:layout_marginTop="96dp"
-        android:background="@color/white"
+        android:background="@drawable/bg_rounded"
+        android:padding="20dp"
         android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/definitions" />
 
@@ -25,7 +27,7 @@
         android:layout_marginTop="16dp"
         android:text="Meanings"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -36,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
         android:textAlignment="center"
-        android:textColor="#F44336"
+        android:textColor="#3C84DD"
         android:textSize="34sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"

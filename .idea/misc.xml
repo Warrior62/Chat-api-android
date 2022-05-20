@@ -3,6 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/TRAVAIL/Android/app/src/main/res/drawable/bg_button.xml" value="0.2445" />
+        <entry key="..\:/TRAVAIL/Android/app/src/main/res/drawable/bg_rounded.xml" value="0.2445" />
+        <entry key="..\:/TRAVAIL/Android/app/src/main/res/drawable/ic_launcher_background.xml" value="0.109" />
+        <entry key="..\:/TRAVAIL/Android/app/src/main/res/layout/activity_choix_conversation.xml" value="0.264" />
+        <entry key="..\:/TRAVAIL/Android/app/src/main/res/layout/activity_definition.xml" value="0.25416666666666665" />
+        <entry key="..\:/TRAVAIL/Android/app/src/main/res/layout/activity_login.xml" value="0.25416666666666665" />
         <entry key="app/src/main/res/layout/activity_choix_conversation.xml" value="0.12626800537109376" />
         <entry key="app/src/main/res/layout/activity_conversations.xml" value="0.12681159420289856" />
         <entry key="app/src/main/res/layout/activity_definition.xml" value="0.2823989868164063" />
