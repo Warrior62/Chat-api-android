@@ -13,8 +13,8 @@
 
     <ConstraintSet android:id="@+id/start">
         <Constraint
-            android:layout_height="430dp"
-            android:layout_width="332dp"
+            android:layout_height="515dp"
+            android:layout_width="345dp"
             android:id="@+id/textViewMsg"
             motion:layout_constraintEnd_toEndOf="parent"
             motion:layout_constraintStart_toStartOf="parent"
@@ -24,41 +24,46 @@
             android:layout_marginStart="32dp"
             android:layout_marginEnd="32dp"
             android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="30dp"
             motion:layout_constraintHorizontal_bias="0.0" />
         <Constraint
-            android:layout_height="wrap_content"
+            android:layout_height="34dp"
             motion:layout_constraintEnd_toEndOf="parent"
-            android:layout_width="wrap_content"
+            android:layout_width="55dp"
             android:id="@+id/btnChoixConv"
             motion:layout_constraintStart_toEndOf="@+id/spinConversations"
-            motion:layout_constraintHorizontal_bias="0.0"
-            android:layout_marginTop="0dp"
+            motion:layout_constraintHorizontal_bias="0.605"
             motion:layout_constraintBottom_toBottomOf="@+id/spinConversations"
-            motion:layout_constraintVertical_bias="1.0"
-            motion:layout_constraintTop_toTopOf="@+id/textView"
-            android:layout_marginEnd="32dp" />
+            motion:layout_constraintVertical_bias="0.842"
+            motion:layout_constraintTop_toTopOf="@+id/spinConversations"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="1dp" />
         <Constraint
-            android:layout_height="47dp"
+            android:layout_height="43dp"
             motion:layout_constraintStart_toStartOf="parent"
-            android:layout_width="312dp"
+            android:layout_width="239dp"
             motion:layout_constraintTop_toBottomOf="@+id/textView"
             android:id="@+id/spinConversations"
             motion:layout_constraintEnd_toStartOf="@+id/btnChoixConv"
             android:layout_marginTop="16dp"
             motion:layout_constraintHorizontal_bias="1.0"
-            android:layout_marginStart="32dp" />
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="8dp"
+            motion:layout_editor_absoluteX="75dp" />
         <Constraint
-            android:layout_height="54dp"
-            android:layout_width="341dp"
+            android:layout_height="65dp"
+            android:layout_width="304dp"
             android:id="@+id/textMsg"
             motion:layout_constraintEnd_toStartOf="@+id/imageButton"
             motion:layout_constraintStart_toStartOf="parent"
             motion:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginStart="16dp" />
+            android:layout_marginStart="16dp"
+            motion:layout_editor_absoluteX="14dp"
+            motion:layout_editor_absoluteY="658dp"
+            android:layout_marginBottom="8dp" />
         <Constraint
-            android:layout_height="56dp"
-            android:layout_width="58dp"
+            android:layout_height="65dp"
+            android:layout_width="63dp"
             android:id="@+id/imageButton"
             motion:layout_constraintEnd_toEndOf="parent"
             motion:layout_constraintTop_toTopOf="@+id/textMsg"

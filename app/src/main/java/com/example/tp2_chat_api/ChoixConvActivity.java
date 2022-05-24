@@ -1,11 +1,13 @@
 package com.example.tp2_chat_api;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageButton;
+import android.text.InputType;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
@@ -14,6 +16,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -93,6 +96,8 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
 
                     // GET ListMessages
                     btnChoixConv.setOnClickListener(view -> {
+                        inputMsg.setInputType(InputType.TYPE_CLASS_TEXT);
+                        clearFocus(inputMsg);
                         textViewMsg.setText("");
                         String idConv = lcId.get(indexConv);
                         Call<ListMessages> callGetMsg = apiService.doGetListMessage(hash, idConv);
@@ -108,6 +113,7 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
                                     callPostMsg.enqueue(new Callback() {
                                         @Override
                                         public void onResponse(Call call, Response response) {
+                                            clearFocus(inputMsg);
                                             gs.alerter("Message sent !");
                                             Call<ListMessages> callGetMsg = apiService.doGetListMessage(hash, idConv);
                                             callGetMsg.enqueue(new Callback<ListMessages>() {
@@ -169,6 +175,14 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
         spinner.setAdapter(adapter);
     }
 
+
+    public void clearFocus(EditText inputMsg) {
+        inputMsg.setText("");
+        inputMsg.clearFocus();
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(inputMsg.getWindowToken(), 0);
+    }
+
     public void updateViewMsg(Response<ListMessages> response, String idConv){
         ListMessages lm = response.body();
         ArrayList<Message> listeMsg = lm.getMessages();
@@ -176,7 +190,7 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
         String toDisplay = "";
         ArrayList<String> auteurList = new ArrayList<>();
         for(Message m : listeMsg) {
-            toDisplay += (m.getAuteur() + " : " + m.getContenu() + "\n");
+            toDisplay += ("\n" + m.getAuteur() + " : \n" + m.getContenu() + "\n");
             auteurList.add(m.getAuteur());
         }
         Set<String> auteurs = new LinkedHashSet<>(auteurList);

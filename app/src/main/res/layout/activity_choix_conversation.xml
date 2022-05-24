@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
+    android:windowSoftInputMode="adjustResize"
     app:layoutDescription="@xml/activity_choix_conversation_scene"
     tools:context=".ChoixConvActivity">
 
@@ -42,6 +43,7 @@
         android:textColor="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/textMsg"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinConversations" />
 
@@ -64,6 +66,7 @@
         android:layout_marginStart="2dp"
         android:layout_marginTop="38dp"
         android:background="@drawable/bg_rounded"
+        android:editable="false"
         android:padding="20dp"
         android:scrollbarStyle="insideInset"
         android:scrollbars="vertical"
