@@ -48,6 +48,7 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
     GlobalState gs;
     ChoixConvActivity cca = this;
     TextView textViewMsg;
+    Spinner spinner;
     Button btnChoixConv;
     EditText inputMsg;
     AppCompatImageButton btnSendMsg;
@@ -61,12 +62,17 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
         gs = (GlobalState) getApplication();
         Bundle bdl = this.getIntent().getExtras();
 
+        // init HTML elements by id
         textViewMsg = findViewById(R.id.textViewMsg);
         btnChoixConv = findViewById(R.id.btnChoixConv);
+        spinner = findViewById(R.id.spinConversations);
         inputMsg = findViewById(R.id.textMsg);
         btnSendMsg = findViewById(R.id.imageButton);
+
+        // retrieve hash from login bundle
         hash = bdl.getString("hash");
 
+        // GET ListConversations
         APIInterface apiService = APIClient.getClient().create(APIInterface.class);
         Call<ListConversations> callGetConvs = apiService.doGetListConversation(hash);
         callGetConvs.enqueue(new Callback<ListConversations>() {
@@ -75,7 +81,6 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
                 ListConversations lc = response.body();
                 if(lc != null){
                     ArrayList<Conversation> listeConv = lc.getConversations();
-                    Log.v("ChoixConv", listeConv.toString());
                     List<String> lcStr = new ArrayList<>();
                     ArrayList<String> lcId = new ArrayList<>();
                     for(Conversation c : listeConv) {
@@ -83,11 +88,8 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
                         lcId.add(c.getId());
                     }
 
-                    Spinner spinner = (Spinner) findViewById(R.id.spinConversations);
-                    spinner.setOnItemSelectedListener(cca);
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(cca, android.R.layout.simple_spinner_item, lcStr);
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spinner.setAdapter(adapter);
+                    // Fill up the spinner with all the conversations theme
+                    initSpinner(lcStr);
 
                     // GET ListMessages
                     btnChoixConv.setOnClickListener(view -> {
@@ -97,21 +99,7 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
                         callGetMsg.enqueue(new Callback<ListMessages>() {
                             @Override
                             public void onResponse(Call<ListMessages> call1, Response<ListMessages> response1) {
-                                ListMessages lm = response1.body();
-                                ArrayList<Message> listeMsg = lm.getMessages();
-                                Log.v("ChoixConv", "idConv="+idConv+", indexConv="+indexConv);
-                                String toDisplay = "";
-                                ArrayList<String> auteurList = new ArrayList<>();
-                                for(Message m : listeMsg) {
-                                    toDisplay += (m.getAuteur() + " : " + m.getContenu() + "\n");
-                                    auteurList.add(m.getAuteur());
-                                }
-                                Set<String> auteurs = new LinkedHashSet<>(auteurList);
-                                SpannableString spannableString = new SpannableString(toDisplay);
-                                splitStringByWords(toDisplay, spannableString, auteurs);
-                                textViewMsg.setText(spannableString);
-                                textViewMsg.setMovementMethod(new ScrollingMovementMethod());
-                                textViewMsg.setMovementMethod(LinkMovementMethod.getInstance());
+                                updateViewMsg(response1, idConv);
 
                                 btnSendMsg.setOnClickListener(view -> {
                                     ChoixConvActivity.PostAsyncTask reqPOST= new PostAsyncTask();
@@ -120,48 +108,27 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
                                     callPostMsg.enqueue(new Callback() {
                                         @Override
                                         public void onResponse(Call call, Response response) {
-                                            Log.v("ChoixConv", "reponse post = " + response.body());
                                             gs.alerter("Message sent !");
                                             Call<ListMessages> callGetMsg = apiService.doGetListMessage(hash, idConv);
                                             callGetMsg.enqueue(new Callback<ListMessages>() {
                                                 @Override
                                                 public void onResponse(Call<ListMessages> call, Response<ListMessages> response) {
-                                                    ListMessages lm = response.body();
-                                                    ArrayList<Message> listeMsg = lm.getMessages();
-                                                    Log.v("ChoixConv", "idConv="+idConv+", indexConv="+indexConv);
-                                                    String toDisplay = "";
-                                                    ArrayList<String> auteurList = new ArrayList<>();
-                                                    for(Message m : listeMsg) {
-                                                        toDisplay += (m.getAuteur() + " : " + m.getContenu() + "\n");
-                                                        auteurList.add(m.getAuteur());
-                                                    }
-                                                    Set<String> auteurs = new LinkedHashSet<>(auteurList);
-                                                    SpannableString spannableString = new SpannableString(toDisplay);
-                                                    splitStringByWords(toDisplay, spannableString, auteurs);
-                                                    textViewMsg.setText(spannableString);
-                                                    textViewMsg.setMovementMethod(new ScrollingMovementMethod());
-                                                    textViewMsg.setMovementMethod(LinkMovementMethod.getInstance());
+                                                    updateViewMsg(response, idConv);
                                                 }
 
                                                 @Override
-                                                public void onFailure(Call<ListMessages> call, Throwable t) {
-
-                                                }
+                                                public void onFailure(Call<ListMessages> call, Throwable t) {}
                                             });
                                         }
 
                                         @Override
-                                        public void onFailure(Call call, Throwable t) {
-
-                                        }
+                                        public void onFailure(Call call, Throwable t) {}
                                     });
                                 });
                             }
 
                             @Override
-                            public void onFailure(Call<ListMessages> call1, Throwable t) {
-
-                            }
+                            public void onFailure(Call<ListMessages> call1, Throwable t) {}
                         });
                     });
                 }
@@ -193,6 +160,31 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
         }
 
         protected void onPostExecute(String hash) {}
+    }
+
+    public void initSpinner(List<String> lcStr){
+        spinner.setOnItemSelectedListener(cca);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(cca, android.R.layout.simple_spinner_item, lcStr);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+    }
+
+    public void updateViewMsg(Response<ListMessages> response, String idConv){
+        ListMessages lm = response.body();
+        ArrayList<Message> listeMsg = lm.getMessages();
+        Log.v("ChoixConv", "idConv="+idConv+", indexConv="+indexConv);
+        String toDisplay = "";
+        ArrayList<String> auteurList = new ArrayList<>();
+        for(Message m : listeMsg) {
+            toDisplay += (m.getAuteur() + " : " + m.getContenu() + "\n");
+            auteurList.add(m.getAuteur());
+        }
+        Set<String> auteurs = new LinkedHashSet<>(auteurList);
+        SpannableString spannableString = new SpannableString(toDisplay);
+        splitStringByWords(toDisplay, spannableString, auteurs);
+        textViewMsg.setText(spannableString);
+        textViewMsg.setMovementMethod(new ScrollingMovementMethod());
+        textViewMsg.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     public HashMap<Integer, Integer> findIndexes(String searchString, String keyword) {
@@ -258,6 +250,7 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
         ArrayList<String> defs = new ArrayList<>();
         JSONArray array = new JSONArray(res);
         JSONObject obj = array.getJSONObject(0);
+        // get all the meanings of the word searched
         JSONArray meanings = obj.getJSONArray("meanings");
         for(int i=0; i<meanings.length(); i++){
             JSONArray definitions = meanings.getJSONObject(i).getJSONArray("definitions");
@@ -267,6 +260,7 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
             }
         }
 
+        // create the bundle to display all the meanings into the Definition Activity
         String word = obj.getString("word");
         Bundle bdl = new Bundle();
         bdl.putStringArrayList("defs", defs);
