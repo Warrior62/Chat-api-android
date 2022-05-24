@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -115,6 +116,45 @@ public class ChoixConvActivity extends AppCompatActivity implements AdapterView.
                                 btnSendMsg.setOnClickListener(view -> {
                                     ChoixConvActivity.PostAsyncTask reqPOST= new PostAsyncTask();
                                     reqPOST.execute("http://tomnab.fr/chat-api/conversations/"+idConv+"/messages?contenu="+inputMsg.getText().toString(), "");
+                                    Call<ResponseBody> callPostMsg = apiService.doPostMessage(hash, idConv, inputMsg.getText().toString());
+                                    callPostMsg.enqueue(new Callback() {
+                                        @Override
+                                        public void onResponse(Call call, Response response) {
+                                            Log.v("ChoixConv", "reponse post = " + response.body());
+                                            gs.alerter("Message sent !");
+                                            Call<ListMessages> callGetMsg = apiService.doGetListMessage(hash, idConv);
+                                            callGetMsg.enqueue(new Callback<ListMessages>() {
+                                                @Override
+                                                public void onResponse(Call<ListMessages> call, Response<ListMessages> response) {
+                                                    ListMessages lm = response.body();
+                                                    ArrayList<Message> listeMsg = lm.getMessages();
+                                                    Log.v("ChoixConv", "idConv="+idConv+", indexConv="+indexConv);
+                                                    String toDisplay = "";
+                                                    ArrayList<String> auteurList = new ArrayList<>();
+                                                    for(Message m : listeMsg) {
+                                                        toDisplay += (m.getAuteur() + " : " + m.getContenu() + "\n");
+                                                        auteurList.add(m.getAuteur());
+                                                    }
+                                                    Set<String> auteurs = new LinkedHashSet<>(auteurList);
+                                                    SpannableString spannableString = new SpannableString(toDisplay);
+                                                    splitStringByWords(toDisplay, spannableString, auteurs);
+                                                    textViewMsg.setText(spannableString);
+                                                    textViewMsg.setMovementMethod(new ScrollingMovementMethod());
+                                                    textViewMsg.setMovementMethod(LinkMovementMethod.getInstance());
+                                                }
+
+                                                @Override
+                                                public void onFailure(Call<ListMessages> call, Throwable t) {
+
+                                                }
+                                            });
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call call, Throwable t) {
+
+                                        }
+                                    });
                                 });
                             }
 
